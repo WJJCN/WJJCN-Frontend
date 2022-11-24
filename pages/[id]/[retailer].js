@@ -55,10 +55,11 @@ import { BsChevronDoubleRight } from "react-icons/bs";
 export default function Product({ products, error }) {
   const router = useRouter();
   const { id } = router.query;
+  const [retailer, setRetailer] = useState(router.query.retailer);
   const [input, setInput] = useState("");
   const [data, setData] = useState(products);
 
-  console.log(products.find((object) => {return object.retailer === router.query.retailer}));
+  console.log(retailer);
 
 
   const clickRetailer = (product) => {
@@ -182,6 +183,10 @@ export default function Product({ products, error }) {
                 <BsChevronDoubleRight className={gridStyles.homeLogo} />
                 <Link href={`/${id}`}>
                   <u style={{ cursor: "pointer" }}>{id}</u>
+                </Link>
+                <BsChevronDoubleRight className={gridStyles.homeLogo} />
+                <Link href={`/${id}/${router.query.retailer}`}>
+                  <u style={{ cursor: "pointer" }}>{router.query.retailer}</u>
                 </Link>
               </h3>
             </div>
