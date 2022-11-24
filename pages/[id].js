@@ -52,6 +52,7 @@ function editDistance(s1, s2) {
 }
 
 export default function Home({ brands, error, errorStateServer }) {
+  console.log(brands);
   const router = useRouter();
   const { id } = router.query;
 
@@ -133,7 +134,7 @@ export default function Home({ brands, error, errorStateServer }) {
                   />
                 </Link>
                 <BsChevronDoubleRight className={gridStyles.homeLogo} />
-                <Link href={"/"}>
+                <Link href={`/${id}`}>
                   <u style={{ cursor: "pointer" }}>{id}</u>
                 </Link>
               </h3>
@@ -178,7 +179,7 @@ export default function Home({ brands, error, errorStateServer }) {
                             className={cardStyles.productBox}
                           >
                             <a
-                              href={`/${id}/${brand.retailers}?product=${product.name}`}
+                              href={`/${id}/${brand.retailer}?product=${product.name}`}
                             >
                               <h4 className={cardStyles.productName}>
                                 {product.name}

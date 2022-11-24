@@ -69,29 +69,42 @@
     float: right;
 }
 
+.breadcrumbContainer {
+    margin-top: 20px;
+}
+
+.breadcrumbContainer h3 {
+    color: white;
+}
+
 .productContainer {
-    display: flex;
     margin-top: 25px;
+    display: flex;
 }
 
 .productNamesCard {
     background-color: white;
     height: 68vh;
     width: 30%;
-    min-width: 25%;
+    min-width: 20%;
     border-radius: 31px;
-    padding: 2rem;
     margin-right: 25px;
+    overflow-y: scroll;
+    scrollbar-color: rebeccapurple green;
+    scrollbar-width: thin;
 }
 
 .productNamesCard h3 {
+    padding: 2rem;
     float: left;
     font-weight: bold;
     margin-right: 100px;
 }
 
 .productNames {
-    font-weight: bold;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 2rem;
 }
 
 .productNames:hover {
@@ -99,10 +112,11 @@
     background-color: #F4F8FB;
 }
 
-.productSearch {
-    display: flex;
+.searchBoxContainer {
+    padding-top: 1.3rem;
 }
 
 .accordionContainer {
-    width: 100%;
+    max-width: 70%;
+    width: 70%;
 }

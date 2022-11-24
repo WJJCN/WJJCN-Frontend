@@ -8,60 +8,97 @@ import { Accordion } from "flowbite-react";
 import Link from "next/link";
 import { BsArrowUp } from "react-icons/bs";
 import { BsArrowDown } from "react-icons/bs";
-import { BsSearch } from "react-icons/bs";
+import { useState, useEffect } from "react";
+import { BiSearch, BiHomeAlt } from "react-icons/bi";
+import { BsChevronDoubleRight } from "react-icons/bs";
+
+// function similarity(s1, s2) {
+//   var longer = s1;
+//   var shorter = s2;
+//   if (s1.length < s2.length) {
+//     longer = s2;
+//     shorter = s1;
+//   }
+//   var longerLength = longer.length;
+//   if (longerLength == 0) {
+//     return 1.0;
+//   }
+//   return (
+//     (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength)
+//   );
+// }
+
+// function editDistance(s1, s2) {
+//   s1 = s1.toLowerCase();
+//   s2 = s2.toLowerCase();
+
+//   var costs = new Array();
+//   for (var i = 0; i <= s1.length; i++) {
+//     var lastValue = i;
+//     for (var j = 0; j <= s2.length; j++) {
+//       if (i == 0) costs[j] = j;
+//       else {
+//         if (j > 0) {
+//           var newValue = costs[j - 1];
+//           if (s1.charAt(i - 1) != s2.charAt(j - 1))
+//             newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+//           costs[j - 1] = lastValue;
+//           lastValue = newValue;
+//         }
+//       }
+//     }
+//     if (i > 0) costs[s2.length] = lastValue;
+//   }
+//   return costs[s2.length];
+// }
 
 export default function Product({ products, error }) {
   const router = useRouter();
   const { id } = router.query;
+  const [input, setInput] = useState("");
+  const [data, setData] = useState(products);
 
-  const clickRetailer = (product, productsCurrentIndex) => {
-    router.push(
-      `/${router.query.id}/${router.query.retailer}?product=${product}&sort=${productsCurrentIndex}`,
-      undefined,
-      { shallow: true }
-    );
+  console.log(products.find((object) => {return object.retailer === router.query.retailer}));
+
+
+  const clickRetailer = (product) => {
+    window.history.pushState("page2", "Title", `/${router.query.id}/${router.query.retailer}?product=${product}`);
   };
 
-  console.log(products);
+  // const setSimilarity = (value) => {
+  //   const suggestions = brands.filter((brand) => {
+  //     if (!value) return false;
+  //     if (similarity(brand.retailer, value) >= 0.7) return true;
+  //     if (brand.retailer.toLowerCase().includes(value.toLowerCase()))
+  //       return true;
+  //     if (value.toLowerCase().includes(brand.retailer.toLowerCase()))
+  //       return true;
+  //     return false;
+  //   });
+  //   if (suggestions.length > 0) {
+  //     setData(suggestions);
+  //   } else {
+  //     setData([...brands.slice(0, 4)]);
+  //   }
+  // };
 
   const previousRetailer = () => {
-    if (products.length === 0) {
-      return;
-    }
-    let index = router.query.sort;
-    let productName;
 
-    if (index == 0) {
-      productName = products[products.length - 1].product;
-      clickRetailer(productName, products.length - 1);
-    } else {
-      productName = products[index - 1].product;
-      clickRetailer(productName, index - 1);
-    }
   };
 
   const nextRetailer = () => {
-    if (products.length === 0) {
-      return;
-    }
-    let index = router.query.sort;
-    let productName;
-
-    if (index == products.length - 1) {
-      productName = products[0].product;
-      clickRetailer(productName, 0);
-    } else {
-      productName = products[+index + 1].product;
-      clickRetailer(productName, +index + 1);
-    }
+   
   };
 
-  const product = products.find((obj) => {
-    if (router.query.product == null) {
-      return Object.values(obj);
-    }
-    return obj.product === router.query.product;
-  });
+  const product = data
+    ? data.find((obj) => {
+        if (router.query.product == null) {
+          return Object.values(obj);
+        }
+        return obj.product === router.query.product;
+      })
+    : null;
+
 
   return (
     <div>
@@ -134,47 +171,84 @@ export default function Product({ products, error }) {
                 </div>
               </div>
             </div>
-            <div>
-              <h3 style={{ color: "white" }}>BreadCrumbs</h3>
+            <div className={productStyles.breadcrumbContainer}>
+              <h3>
+                <Link href="/" className={gridStyles.Link}>
+                  <BiHomeAlt
+                    style={{ cursor: "pointer" }}
+                    className={gridStyles.homeLogo}
+                  />
+                </Link>
+                <BsChevronDoubleRight className={gridStyles.homeLogo} />
+                <Link href={`/${id}`}>
+                  <u style={{ cursor: "pointer" }}>{id}</u>
+                </Link>
+              </h3>
             </div>
             <div className={productStyles.productContainer}>
-              <div className={productStyles.productNamesCard}>
+                <div className={productStyles.productNamesCard}>
                   <div>
                     <h3>Product:</h3>
                   </div>
-                  <div className={productStyles.productSearch}>
-                    <p>Search here...</p>
-                    <BsSearch />
+                  <div
+                    className={`${gridStyles.Searchbox} ${productStyles.searchBoxContainer}`}
+                  >
+                    <input
+                      value={input}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          //clickLink(e);
+                        }
+                      }}
+                      onChange={(e) => {
+                        setSimilarity(e.target.value);
+                        setInput(e.target.value);
+                      }}
+                      placeholder="Search..."
+                      className={gridStyles.Searchbar}
+                    />
+                    <button
+                      //onClick={clickLink}
+                      className={gridStyles.SearchButton}
+                    >
+                      <BiSearch />
+                    </button>
                   </div>
-                {products
-                  ? products.map((product) => {
-                      return (
-                        <div className={productStyles.productNames} key={product._id.$oid}>
-                          <button
-                            onClick={() =>
-                              clickRetailer(
-                                product.product,
-                                products.findIndex((object) => {
-                                  return object.product === product.product;
-                                })
-                              )
-                            }
+                  <div className={productStyles.scrollBar}>
+
+                  </div>
+                  {data
+                    ? data.map((product) => {
+                        return (
+                          <div
+                            className={productStyles.productNames}
+                            key={product._id.$oid}
                           >
-                            {product.product}
-                          </button>
-                        </div>
-                      );
-                    })
-                  : null}
-              </div>
-              <br></br>
-              <div className={productStyles.accordionContainer}>
-                <Accordion
-                  alwaysOpen={false}
-                  style={{ backgroundColor: "white" }}
-                >
-                  {product
-                    ? Object.entries(product.product_brand).map(
+                            <button
+                              onClick={() =>
+                                clickRetailer(
+                                  product.product,
+                                  data.findIndex((object) => {
+                                    return object.product === product.product;
+                                  })
+                                )
+                              }
+                            >
+                              {product.product}
+                            </button>
+                          </div>
+                        );
+                      })
+                    : null}
+                </div>
+                <br></br>
+                <div className={productStyles.accordionContainer}>
+                  <Accordion
+                    alwaysOpen={false}
+                    style={{ backgroundColor: "white" }}
+                  >
+                    {product ? (
+                      Object.entries(product.product_brand).map(
                         ([key, value]) => {
                           return (
                             <Accordion.Panel key={key}>
@@ -200,7 +274,7 @@ export default function Product({ products, error }) {
                                     <br></br>
                                     <h6>Text:</h6>
                                     <br></br>
-                                    <p>{product.product_scraped[key]}</p>
+                                    <p>{product.product_scraped[key].text}</p>
                                   </div>
                                 </div>
                               </Accordion.Content>
@@ -208,11 +282,17 @@ export default function Product({ products, error }) {
                           );
                         }
                       )
-                    : <Accordion.Panel><Accordion.Content><h1> Error </h1></Accordion.Content> </Accordion.Panel>}
-                </Accordion>
+                    ) : (
+                      <Accordion.Panel>
+                        <Accordion.Content>
+                          <h1> Error </h1>
+                        </Accordion.Content>{" "}
+                      </Accordion.Panel>
+                    )}
+                  </Accordion>
+                </div>
               </div>
             </div>
-          </div>
         )}
       </main>
     </div>
@@ -222,32 +302,13 @@ export default function Product({ products, error }) {
 export async function getServerSideProps(context) {
   const url = context.req.headers.host;
 
+  console.log("testa")
+
   try {
     const res = await fetch(
       `http://${url}/api/product?name=${context.query.id}&retailer=${context.query.retailer}`
     );
     let data = await res.json();
-    console.log("Fetched data...");
-    const datametscore = data.data.map((product) => {
-      let goed = 0;
-      Object.entries(product.product_brand).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          if (value.join("") === product.product_scraped[key].join("")) {
-            goed++;
-          }
-        }
-        if (value === product.product_scraped[key]) {
-          goed++;
-        }
-      });
-      product.score = (
-        (goed / Object.keys(product.product_brand).length) *
-        100
-      ).toFixed(2);
-
-      return product;
-    });
-    data.data = datametscore;
 
     if (data.status === "error") {
       return {
@@ -262,7 +323,9 @@ export async function getServerSideProps(context) {
     }
   } catch (error) {
     return {
-      error: error,
+      props: {
+        error: error.message,
+      },
     };
   }
 }
