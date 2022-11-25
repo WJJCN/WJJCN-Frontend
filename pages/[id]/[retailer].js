@@ -57,13 +57,31 @@ export default function Product({ products, error }) {
   const { id } = router.query;
   const [retailer, setRetailer] = useState(router.query.retailer);
   const [input, setInput] = useState("");
-  const [data, setData] = useState(products);
+  const [data, setData] = useState(products.filter((o) => { return o.retailer === retailer}));
+  const [dataProduct, setDataProduct] = useState(data.find((o) => { return o.product === router.query.product}));
+  const [urlChange, setUrlChange] = useState(false);
 
-  console.log(retailer);
+  useEffect(() => {
+    if (router.query.retailer !== retailer)
+    {
+      setRetailer(router.query.retailer);
+      setData(products.filter((o) => { return o.retailer === router.query.retailer}))
+    }
+    if (urlChange)
+    {
+      setDataProduct(data.find((o) => { 
+        let queryProductName = new URLSearchParams(window.location.search)
+        return o.product === queryProductName.get("product")
+      }))
+      setUrlChange(false);
+    }
+
+  }, [urlChange, data, retailer, router])
 
 
   const clickRetailer = (product) => {
     window.history.pushState("page2", "Title", `/${router.query.id}/${router.query.retailer}?product=${product}`);
+    setUrlChange(true);
   };
 
   // const setSimilarity = (value) => {
@@ -91,14 +109,7 @@ export default function Product({ products, error }) {
    
   };
 
-  const product = data
-    ? data.find((obj) => {
-        if (router.query.product == null) {
-          return Object.values(obj);
-        }
-        return obj.product === router.query.product;
-      })
-    : null;
+  const product = dataProduct;
 
 
   return (
